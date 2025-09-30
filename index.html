@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -34,7 +34,7 @@
             color: #333;
             margin-bottom: 30px;
             font-size: 2.5em;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -73,12 +73,12 @@
 
         .medium-textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+            border-color: #e6683c;
+            box-shadow: 0 0 10px rgba(230, 104, 60, 0.2);
         }
 
         .file-upload-area {
-            border: 3px dashed #667eea;
+            border: 3px dashed #e6683c;
             border-radius: 15px;
             padding: 40px;
             text-align: center;
@@ -89,8 +89,8 @@
         }
 
         .file-upload-area:hover {
-            background: #f0f4ff;
-            border-color: #764ba2;
+            background: #fff5f3;
+            border-color: #dc2743;
         }
 
         .file-upload-area.dragover {
@@ -172,9 +172,9 @@
 
         .control-section h3 {
             margin-bottom: 15px;
-            color: #667eea;
+            color: #e6683c;
             font-size: 1.2em;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #e6683c;
             padding-bottom: 5px;
         }
 
@@ -211,7 +211,7 @@
         .control-group input:focus,
         .control-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #e6683c;
         }
 
         .text-alignment {
@@ -231,14 +231,14 @@
         }
 
         .alignment-btn:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+            border-color: #e6683c;
+            background: #fff5f3;
         }
 
         .alignment-btn.active {
-            background: #667eea;
+            background: #e6683c;
             color: white;
-            border-color: #667eea;
+            border-color: #e6683c;
         }
 
         .text-effects {
@@ -258,14 +258,14 @@
         }
 
         .effect-btn:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+            border-color: #e6683c;
+            background: #fff5f3;
         }
 
         .effect-btn.active {
-            background: #667eea;
+            background: #e6683c;
             color: white;
-            border-color: #667eea;
+            border-color: #e6683c;
         }
 
         .preview-section {
@@ -324,13 +324,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 20px rgba(240, 148, 51, 0.4);
         }
 
         .btn-success {
@@ -365,7 +365,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             transition: width 0.3s ease;
             width: 0%;
         }
@@ -400,7 +400,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>📸 Instagram画像ジェネレーター (4:5)</h1>
+        <h1>📷 Instagram画像ジェネレーター (4:5)</h1>
 
         <div class="input-section">
             <div class="input-container">
@@ -528,18 +528,9 @@
 
                     <div class="control-group">
                         <label>フォントサイズ</label>
-                        <input type="number" id="titleFontSize" value="90" min="20" max="200">
+                        <input type="number" id="titleFontSize" value="120" min="20" max="200">
                     </div>
 
-                    <div class="control-group">
-                        <label>テキストの色</label>
-                        <input type="color" id="titleTextColor" value="#ffffff">
-                    </div>
-
-                    <div class="control-group">
-                        <label>影・アウトラインの色</label>
-                        <input type="color" id="titleShadowColor" value="#000000">
-                    </div>
                 </div>
 
                 <div class="control-row">
@@ -552,11 +543,6 @@
                         </div>
                     </div>
 
-                    <div class="control-group">
-                        <label>透明度</label>
-                        <input type="range" id="titleTextOpacity" min="0" max="100" value="100">
-                        <span id="titleOpacityValue">100%</span>
-                    </div>
                 </div>
 
                 <div class="control-group">
@@ -631,18 +617,9 @@
 
                     <div class="control-group">
                         <label>フォントサイズ</label>
-                        <input type="number" id="contentFontSize" value="60" min="20" max="200">
+                        <input type="number" id="contentFontSize" value="90" min="20" max="200">
                     </div>
 
-                    <div class="control-group">
-                        <label>テキストの色</label>
-                        <input type="color" id="contentTextColor" value="#ffffff">
-                    </div>
-
-                    <div class="control-group">
-                        <label>影・アウトラインの色</label>
-                        <input type="color" id="contentShadowColor" value="#000000">
-                    </div>
                 </div>
 
                 <div class="control-row">
@@ -658,12 +635,6 @@
                     <div class="control-group">
                         <label>縦位置（%）</label>
                         <input type="number" id="contentY" value="35" min="20" max="50">
-                    </div>
-
-                    <div class="control-group">
-                        <label>透明度</label>
-                        <input type="range" id="contentTextOpacity" min="0" max="100" value="100">
-                        <span id="contentOpacityValue">100%</span>
                     </div>
                 </div>
 
@@ -712,22 +683,17 @@
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
 
+        // 文字色の配列（ランダムに選択される）
+        const TEXT_COLORS = ['#ff751f', '#ffffff', '#0cc0df', '#00bf63', '#ffde59', '#cb6ce6', '#ff66c4', '#ff3131', '#c1ff72'];
+
         // タイトル用の設定
         const titleFontSelect = document.getElementById('titleFontSelect');
         const titleFontSize = document.getElementById('titleFontSize');
-        const titleTextColor = document.getElementById('titleTextColor');
-        const titleShadowColor = document.getElementById('titleShadowColor');
-        const titleTextOpacity = document.getElementById('titleTextOpacity');
-        const titleOpacityValue = document.getElementById('titleOpacityValue');
 
         // コンテンツ用の設定
         const contentFontSelect = document.getElementById('contentFontSelect');
         const contentFontSize = document.getElementById('contentFontSize');
-        const contentTextColor = document.getElementById('contentTextColor');
-        const contentShadowColor = document.getElementById('contentShadowColor');
         const contentY = document.getElementById('contentY');
-        const contentTextOpacity = document.getElementById('contentTextOpacity');
-        const contentOpacityValue = document.getElementById('contentOpacityValue');
 
         const clearFilesBtn = document.getElementById('clearFilesBtn');
         const generateBtn = document.getElementById('generateBtn');
@@ -746,14 +712,6 @@
         clearFilesBtn.addEventListener('click', clearFiles);
         generateBtn.addEventListener('click', generateImages);
         downloadZipBtn.addEventListener('click', downloadAsZip);
-
-        titleTextOpacity.addEventListener('input', (e) => {
-            titleOpacityValue.textContent = e.target.value + '%';
-        });
-
-        contentTextOpacity.addEventListener('input', (e) => {
-            contentOpacityValue.textContent = e.target.value + '%';
-        });
 
         // テキスト配置ボタン（タイトル用）
         document.querySelectorAll('.text-alignment[data-target="title"] .alignment-btn').forEach(btn => {
@@ -873,23 +831,96 @@
             return text.replace(/\\n/g, '\n').split('\n');
         }
 
+        // フォントが読み込まれているかチェックする関数
+        function checkFontLoaded(fontFamily, fontSize = 16) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // フォールバックフォントでテストテキストを描画
+            ctx.font = `${fontSize}px monospace`;
+            const fallbackWidth = ctx.measureText('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').width;
+
+            // 指定フォントでテストテキストを描画
+            ctx.font = `${fontSize}px ${fontFamily}, monospace`;
+            const testWidth = ctx.measureText('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').width;
+
+            // 幅が異なればフォントが読み込まれている
+            return Math.abs(fallbackWidth - testWidth) > 1;
+        }
+
+        // フォント読み込みを待つ関数
+        async function waitForFont(fontFamily, timeout = 5000) {
+            const startTime = Date.now();
+
+            while (Date.now() - startTime < timeout) {
+                if (checkFontLoaded(fontFamily)) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+
+            console.warn(`フォント "${fontFamily}" の読み込みがタイムアウトしました`);
+            return false;
+        }
+
+        // ランダムな文字色を取得（前回と異なる色を選択）
+        let lastTitleColor = null;
+        let lastContentColor = null;
+
+        function getRandomTextColor(isTitle) {
+            const lastColor = isTitle ? lastTitleColor : lastContentColor;
+            const otherColor = isTitle ? lastContentColor : lastTitleColor;
+
+            let availableColors = TEXT_COLORS.filter(color => color !== lastColor && color !== otherColor);
+
+            // 利用可能な色がない場合は、少なくとも前回と異なる色を選ぶ
+            if (availableColors.length === 0) {
+                availableColors = TEXT_COLORS.filter(color => color !== lastColor);
+            }
+
+            // それでもない場合は全色から選ぶ
+            if (availableColors.length === 0) {
+                availableColors = TEXT_COLORS;
+            }
+
+            const selectedColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+
+            if (isTitle) {
+                lastTitleColor = selectedColor;
+            } else {
+                lastContentColor = selectedColor;
+            }
+
+            return selectedColor;
+        }
+
         // テキストを描画する共通関数
-        function drawText(ctx, text, font, fontSize, color, shadowColor, alignment, effect, opacity, posX, posY, canvasWidth) {
+        async function drawText(ctx, text, font, fontSize, color, alignment, effect, posX, posY, canvasWidth) {
             if (!text || !text.trim()) return;
 
             const textLines = splitText(text);
 
-            // フォントを確実に設定
+            // フォントの読み込みを待つ
+            await waitForFont(font, 3000);
+
+            // コンテキストの状態を保存
+            ctx.save();
+
+            // フォントを確実に設定（複数回設定して確実にする）
             ctx.font = `bold ${fontSize}px ${font}`;
 
-            // フォント読み込み待ちとして少し待つ（フォールバック）
+            // 少し待機してフォント適用を確実にする
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // 再度フォントを設定
+            ctx.font = `bold ${fontSize}px ${font}`;
+
             ctx.textAlign = alignment;
             ctx.textBaseline = 'middle';
-            ctx.globalAlpha = opacity / 100;
+            ctx.globalAlpha = 1; // 透明度100%固定
 
             const lineHeight = fontSize * 1.2;
-            const totalTextHeight = textLines.length * lineHeight;
-            const startY = posY - totalTextHeight / 2 + lineHeight / 2;
+            const startY = posY;
 
             let x;
             switch(alignment) {
@@ -914,37 +945,86 @@
 
                 switch(effect) {
                     case 'shadow':
-                        ctx.shadowColor = shadowColor;
-                        ctx.shadowBlur = 10;
-                        ctx.shadowOffsetX = 5;
-                        ctx.shadowOffsetY = 5;
+                        // 白の外側の影
+                        ctx.shadowColor = '#ffffff';
+                        ctx.shadowBlur = 16;
+                        ctx.shadowOffsetX = 14;
+                        ctx.shadowOffsetY = 14;
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(line, x, lineY);
+
+                        // 黒の影
+                        ctx.shadowColor = '#000000';
+                        ctx.shadowBlur = 20;
+                        ctx.shadowOffsetX = 10;
+                        ctx.shadowOffsetY = 10;
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(line, x, lineY);
+
+                        // メインテキスト
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
                         ctx.fillStyle = color;
                         ctx.fillText(line, x, lineY);
                         break;
 
                     case 'outline':
+                        // 白の外側のアウトライン
                         ctx.lineJoin = 'round';
-                        ctx.strokeStyle = shadowColor;
-                        ctx.lineWidth = 6;
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 20;
                         ctx.strokeText(line, x, lineY);
+
+                        // 黒のアウトライン
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = 12;
+                        ctx.strokeText(line, x, lineY);
+
+                        // メインテキスト
                         ctx.fillStyle = color;
                         ctx.fillText(line, x, lineY);
                         break;
 
                     case 'glow':
-                        ctx.shadowColor = color;
-                        ctx.shadowBlur = 20;
-                        for(let i = 0; i < 3; i++) {
-                            ctx.fillStyle = color;
+                        // 白の外側のグロー
+                        ctx.shadowColor = '#ffffff';
+                        ctx.shadowBlur = 50;
+                        for(let i = 0; i < 2; i++) {
+                            ctx.fillStyle = '#000000';
                             ctx.fillText(line, x, lineY);
                         }
+
+                        // 黒のグロー
+                        ctx.shadowColor = '#000000';
+                        ctx.shadowBlur = 40;
+                        for(let i = 0; i < 3; i++) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillText(line, x, lineY);
+                        }
+
+                        // メインテキスト
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = color;
+                        ctx.fillText(line, x, lineY);
                         break;
 
                     case '3d':
-                        for(let i = 0; i < 5; i++) {
-                            ctx.fillStyle = shadowColor;
+                        // 白の3D影
+                        for(let i = 12; i < 16; i++) {
+                            ctx.fillStyle = '#ffffff';
                             ctx.fillText(line, x + i*2, lineY + i*2);
                         }
+
+                        // 黒の3D影
+                        for(let i = 0; i < 10; i++) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillText(line, x + i*2, lineY + i*2);
+                        }
+
+                        // メインテキスト
                         ctx.fillStyle = color;
                         ctx.fillText(line, x, lineY);
                         break;
@@ -958,19 +1038,29 @@
             });
 
             ctx.globalAlpha = 1;
+
+            // 全体のコンテキスト状態を復元
+            ctx.restore();
         }
 
         // キャンバスにテキストを描画
-        function drawTextOnCanvas(canvas, ctx, img, titleText, contentText) {
+        async function drawTextOnCanvas(canvas, ctx, img, titleText, contentText) {
             const canvasWidth = 1080;
             const canvasHeight = 1350; // 4:5の比率
 
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
 
+            // コンテキストを完全にリセット
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
             // 背景を白で塗りつぶし
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // デフォルト設定をクリア
+            ctx.restore();
 
             // 画像を4:5にフィットさせる（正方形をトリミング）
             let sourceX = 0, sourceY = 0;
@@ -999,16 +1089,15 @@
             // タイトルを描画（上部10%固定）
             if (titleText && titleText.trim()) {
                 const titlePosY = canvasHeight * 0.1;
-                drawText(
+                const titleColor = getRandomTextColor(true);
+                await drawText(
                     ctx,
                     titleText,
                     titleFontSelect.value,
                     parseInt(titleFontSize.value),
-                    titleTextColor.value,
-                    titleShadowColor.value,
+                    titleColor,
                     titleAlignment,
                     titleEffect,
-                    parseFloat(titleTextOpacity.value),
                     0,
                     titlePosY,
                     canvasWidth
@@ -1018,16 +1107,15 @@
             // コンテンツを描画
             if (contentText && contentText.trim()) {
                 const contentPosY = (parseFloat(contentY.value) / 100) * canvasHeight;
-                drawText(
+                const contentColor = getRandomTextColor(false);
+                await drawText(
                     ctx,
                     contentText,
                     contentFontSelect.value,
                     parseInt(contentFontSize.value),
-                    contentTextColor.value,
-                    contentShadowColor.value,
+                    contentColor,
                     contentAlignment,
                     contentEffect,
-                    parseFloat(contentTextOpacity.value),
                     0,
                     contentPosY,
                     canvasWidth
@@ -1059,6 +1147,8 @@
 
             generatedCanvases = [];
             previewGrid.innerHTML = '';
+            previewSection.style.display = 'none';
+            downloadZipBtn.style.display = 'none';
             progressBar.style.display = 'block';
             statusText.style.display = 'block';
             generateBtn.disabled = true;
@@ -1075,7 +1165,7 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
 
-                        drawTextOnCanvas(canvas, ctx, img, titleLines[i], contentLines[i]);
+                        await drawTextOnCanvas(canvas, ctx, img, titleLines[i], contentLines[i]);
                         generatedCanvases.push({
                             canvas,
                             filename: `instagram_image_${String(i + 1).padStart(3, '0')}.png`
