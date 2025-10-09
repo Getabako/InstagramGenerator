@@ -777,7 +777,10 @@
         // ファイルを追加
         function addFiles(files) {
             uploadedFiles = [...uploadedFiles, ...files];
-            uploadedFiles.sort((a, b) => a.name.localeCompare(b.name));
+            // 数値を考慮した自然順ソート
+            uploadedFiles.sort((a, b) => {
+                return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+            });
             updateFileList();
         }
 
