@@ -77,6 +77,32 @@
             box-shadow: 0 0 10px rgba(230, 104, 60, 0.2);
         }
 
+        #titleInput {
+            color: #d9ead3;
+        }
+
+        #titleInput::placeholder {
+            color: #6aa84f;
+            opacity: 1;
+        }
+
+        #contentInput {
+            color: #cfe2f3;
+        }
+
+        #contentInput::placeholder {
+            color: #3d85c6;
+            opacity: 1;
+        }
+
+        .title-section h2 {
+            color: #6aa84f;
+        }
+
+        .content-section h2 {
+            color: #3d85c6;
+        }
+
         .file-upload-area {
             border: 3px dashed #e6683c;
             border-radius: 15px;
@@ -403,7 +429,7 @@
         <h1>📷 Instagram画像ジェネレーター (4:5)</h1>
 
         <div class="input-section">
-            <div class="input-container">
+            <div class="input-container title-section">
                 <h2>📝 タイトルテキスト入力</h2>
                 <textarea
                     id="titleInput"
@@ -426,7 +452,7 @@
                 </div>
             </div>
 
-            <div class="input-container">
+            <div class="input-container content-section">
                 <h2>📄 コンテンツテキスト入力</h2>
                 <textarea
                     id="contentInput"
