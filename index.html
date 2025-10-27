@@ -39,6 +39,43 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #f09433;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-radius: 10px 10px 0 0;
+            color: #666;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .input-section {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -428,6 +465,12 @@
     <div class="container">
         <h1>📷 Instagram画像ジェネレーター (4:5)</h1>
 
+        <div class="tabs">
+            <button class="tab-button active" data-tab="image-generator">画像生成</button>
+            <button class="tab-button" data-tab="csv-generator">CSV作成</button>
+        </div>
+
+        <div class="tab-content active" id="image-generator">
         <div class="input-section">
             <div class="input-container title-section">
                 <h2>📝 タイトルテキスト入力</h2>
@@ -692,6 +735,67 @@
             <h2>🖼️ プレビュー（4:5）</h2>
             <div class="preview-grid" id="previewGrid"></div>
         </div>
+        </div>
+
+        <div class="tab-content" id="csv-generator">
+            <div class="input-section" style="grid-template-columns: 1fr 1fr;">
+                <div class="input-container">
+                    <h2>📁 画像設定</h2>
+                    <div class="control-group" style="margin-bottom: 20px;">
+                        <label>フォルダ名</label>
+                        <input type="text" id="csvFolderName" placeholder="例: tech_post_2025_10" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                    </div>
+                    <div class="control-group" style="margin-bottom: 20px;">
+                        <label>画像の枚数（4の倍数）</label>
+                        <input type="number" id="csvImageCount" placeholder="例: 8" min="4" step="4" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                    </div>
+                    <div class="control-group" style="margin-bottom: 20px;">
+                        <label>サンクスメッセージ画像名</label>
+                        <input type="text" id="csvThanksImage" placeholder="例: iftech_thanks.png" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                    </div>
+                    <div class="help-text">
+                        • フォルダ名: 画像が保存されているフォルダ名<br>
+                        • 画像枚数: 4の倍数で入力（4枚 + サンクス1枚 = 5枚セット）<br>
+                        • サンクスメッセージ: 各セットの最後に追加される画像名
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <h2>📝 テキストデータ入力</h2>
+                    <textarea
+                        id="csvTextInput"
+                        class="medium-textarea"
+                        placeholder="1行目: 1日分のテキストとハッシュタグ
+2行目: 2日分のテキストとハッシュタグ
+3行目: 3日分のテキストとハッシュタグ
+...
+
+例:
+AI技術を子どもにも分かりやすく解説 写真を撮る AIが認識・分析 3Dモデル自動生成 マイクラに一瞬で建築最新技術を楽しく学べる環境です！
+効果的な目標設定のコツ 具体的で測定可能な目標 短期・中期・長期の計画 親子で共有する夢 達成の喜びを分かち合う目標設定から達成まで丁寧にサポート！
+
+※スプレッドシートから一気に貼り付けてください"></textarea>
+                    <div class="help-text">
+                        • 1行につき1日分のテキスト<br>
+                        • スプレッドシートからコピーして一気に貼り付けできます<br>
+                        • 画像の枚数÷4 = 必要な行数
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="generateCsvBtn">CSV生成</button>
+                <button class="btn btn-success" id="downloadCsvBtn" style="display: none;">CSVダウンロード</button>
+            </div>
+
+            <div class="preview-section" id="csvPreviewSection" style="display: none;">
+                <h2>📄 プレビュー</h2>
+                <div style="background: white; padding: 20px; border-radius: 10px; overflow-x: auto;">
+                    <pre id="csvPreview" style="margin: 0; font-family: monospace; font-size: 12px; white-space: pre-wrap;"></pre>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -1197,7 +1301,7 @@
                         await drawTextOnCanvas(canvas, ctx, img, titleLines[i], contentLines[i]);
                         generatedCanvases.push({
                             canvas,
-                            filename: `instagram_image_${String(i + 1).padStart(3, '0')}.png`
+                            filename: `${String(i + 1).padStart(3, '0')}.png`
                         });
 
                         // プレビュー表示
@@ -1246,6 +1350,21 @@
                 return;
             }
 
+            // 事業名を入力
+            const businessName = prompt('事業名を入力してください:');
+            if (!businessName || businessName.trim() === '') {
+                alert('事業名が入力されていません。');
+                return;
+            }
+
+            // 現在の年月を取得
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+
+            // フォルダ名を生成: {事業名}_post_{年}_{月}
+            const folderName = `${businessName.trim()}_post_${year}_${month}`;
+
             const zip = new JSZip();
 
             statusText.textContent = 'ZIPファイルを作成中...';
@@ -1254,7 +1373,8 @@
             generatedCanvases.forEach(({ canvas, filename }) => {
                 const dataUrl = canvas.toDataURL('image/png');
                 const base64Data = dataUrl.split(',')[1];
-                zip.file(filename, base64Data, { base64: true });
+                // フォルダ名を含めてファイルを追加
+                zip.file(`${folderName}/${filename}`, base64Data, { base64: true });
             });
 
             try {
@@ -1262,7 +1382,7 @@
 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(content);
-                link.download = 'instagram_images.zip';
+                link.download = `${folderName}.zip`;
                 link.click();
 
                 statusText.textContent = 'ダウンロード完了！';
@@ -1274,6 +1394,147 @@
                 console.error('ZIP作成エラー:', error);
                 statusText.textContent = 'ZIPファイルの作成に失敗しました。';
             }
+        }
+
+        // タブ切り替え機能
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+
+                // すべてのタブボタンとコンテンツから active クラスを削除
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // クリックされたタブボタンと対応するコンテンツに active クラスを追加
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // CSV生成機能
+        let generatedCsvData = '';
+
+        const csvFolderName = document.getElementById('csvFolderName');
+        const csvImageCount = document.getElementById('csvImageCount');
+        const csvThanksImage = document.getElementById('csvThanksImage');
+        const csvTextInput = document.getElementById('csvTextInput');
+        const generateCsvBtn = document.getElementById('generateCsvBtn');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        const csvPreviewSection = document.getElementById('csvPreviewSection');
+        const csvPreview = document.getElementById('csvPreview');
+
+        generateCsvBtn.addEventListener('click', generateCsv);
+        downloadCsvBtn.addEventListener('click', downloadCsv);
+
+        function generateCsv() {
+            const folderName = csvFolderName.value.trim();
+            const imageCount = parseInt(csvImageCount.value);
+            const thanksImage = csvThanksImage.value.trim();
+            const textLines = csvTextInput.value.split('\n').filter(line => line.trim());
+
+            // バリデーション
+            if (!folderName) {
+                alert('フォルダ名を入力してください。');
+                return;
+            }
+
+            if (!imageCount || imageCount <= 0) {
+                alert('画像の枚数を入力してください。');
+                return;
+            }
+
+            if (imageCount % 4 !== 0) {
+                alert('画像の枚数は4の倍数である必要があります。\n入力された枚数: ' + imageCount);
+                return;
+            }
+
+            if (!thanksImage) {
+                alert('サンクスメッセージ画像名を入力してください。');
+                return;
+            }
+
+            const expectedRows = imageCount / 4;
+            if (textLines.length !== expectedRows) {
+                alert(`テキスト行数が一致しません。\n画像枚数: ${imageCount}枚\n必要な行数: ${expectedRows}行\n現在の行数: ${textLines.length}行`);
+                return;
+            }
+
+            // CSV生成
+            const baseUrl = 'https://images.if-juku.net';
+            const csvRows = [];
+
+            // ヘッダー
+            csvRows.push(['Date', 'Text', 'Link(s)', 'Media URL(s)']);
+
+            // 明日から開始する日付を生成
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() + 1); // 明日に設定
+            startDate.setHours(18, 0, 0, 0); // 18:00に設定
+
+            let imageIndex = 1;
+
+            for (let i = 0; i < expectedRows; i++) {
+                // 日付を生成
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const hours = String(currentDate.getHours()).padStart(2, '0');
+                const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+                // 画像URLを生成（4枚 + サンクス1枚）
+                const imageUrls = [];
+                for (let j = 0; j < 4; j++) {
+                    const imageNumber = String(imageIndex++).padStart(3, '0');
+                    imageUrls.push(`${baseUrl}/${folderName}/${imageNumber}.png`);
+                }
+                imageUrls.push(`${baseUrl}/${folderName}/${thanksImage}`);
+
+                // 行を追加
+                csvRows.push([
+                    formattedDate,
+                    textLines[i],
+                    '',
+                    imageUrls.join(',')
+                ]);
+            }
+
+            // CSV文字列に変換
+            generatedCsvData = csvRows.map(row => {
+                return row.map(cell => {
+                    // セルにカンマや改行が含まれる場合はダブルクォートで囲む
+                    if (cell.includes(',') || cell.includes('\n') || cell.includes('"')) {
+                        return '"' + cell.replace(/"/g, '""') + '"';
+                    }
+                    return cell;
+                }).join(',');
+            }).join('\n');
+
+            // プレビュー表示
+            csvPreview.textContent = generatedCsvData;
+            csvPreviewSection.style.display = 'block';
+            downloadCsvBtn.style.display = 'inline-block';
+        }
+
+        function downloadCsv() {
+            if (!generatedCsvData) {
+                alert('まずCSVを生成してください。');
+                return;
+            }
+
+            // BOM付きUTF-8でダウンロード（Excelで文字化けしないように）
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+            const blob = new Blob([bom, generatedCsvData], { type: 'text/csv;charset=utf-8;' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '一括投稿データ.csv';
+            link.click();
+
+            URL.revokeObjectURL(link.href);
         }
     </script>
 </body>
