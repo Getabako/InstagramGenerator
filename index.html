@@ -742,9 +742,13 @@
             <div class="controls" style="margin-bottom: 20px;">
                 <h2>🔐 アクセス設定</h2>
                 <div class="control-section">
-                    <div class="control-group" style="max-width: 400px;">
+                    <div class="control-group" style="max-width: 600px;">
                         <label>アップロード用パスワード</label>
-                        <input type="password" id="uploadPassword" placeholder="パスワードを入力" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+                            <input type="password" id="uploadPassword" placeholder="パスワードを入力" style="flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                            <button class="btn btn-primary" id="verifyPasswordBtn" style="padding: 10px 20px; white-space: nowrap;">パスワード確認</button>
+                        </div>
+                        <div id="passwordStatus" style="margin-top: 10px; padding: 10px; border-radius: 8px; display: none;"></div>
                         <div class="help-text" style="margin-top: 10px;">
                             セキュリティのため、アップロード時にパスワード認証が必要です
                         </div>
@@ -1602,6 +1606,8 @@ AI技術を子どもにも分かりやすく解説 写真を撮る AIが認識�
         const UPLOAD_API_URL = 'https://images.if-juku.net/upload.php'; // アップロード先のPHPファイルURL
 
         const uploadPassword = document.getElementById('uploadPassword');
+        const verifyPasswordBtn = document.getElementById('verifyPasswordBtn');
+        const passwordStatus = document.getElementById('passwordStatus');
         const folderUploadArea = document.getElementById('folderUploadArea');
         const selectFolderBtn = document.getElementById('selectFolderBtn');
         const folderInput = document.getElementById('folderInput');
@@ -1616,6 +1622,7 @@ AI技術を子どもにも分かりやすく解説 写真を撮る AIが認識�
         const uploadResultContent = document.getElementById('uploadResultContent');
 
         // イベントリスナー
+        verifyPasswordBtn.addEventListener('click', verifyPassword);
         selectFolderBtn.addEventListener('click', () => folderInput.click());
         folderInput.addEventListener('change', handleFolderSelect);
         folderUploadArea.addEventListener('dragover', handleFolderDragOver);
@@ -1623,6 +1630,70 @@ AI技術を子どもにも分かりやすく解説 写真を撮る AIが認識�
         folderUploadArea.addEventListener('drop', handleFolderDrop);
         clearUploadBtn.addEventListener('click', clearUploadFiles);
         startUploadBtn.addEventListener('click', startUpload);
+
+        // パスワード検証機能
+        async function verifyPassword() {
+            const password = uploadPassword.value.trim();
+
+            if (!password) {
+                showPasswordStatus('パスワードを入力してください', 'error');
+                return;
+            }
+
+            verifyPasswordBtn.disabled = true;
+            verifyPasswordBtn.textContent = '確認中...';
+            passwordStatus.style.display = 'none';
+
+            try {
+                // 1x1pxの透明なPNG画像を作成（テスト用）
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+                const testFile = new File([blob], 'test.png', { type: 'image/png' });
+
+                const formData = new FormData();
+                formData.append('file', testFile);
+                formData.append('path', '_test/test.png');
+                formData.append('password', password);
+
+                const response = await fetch(UPLOAD_API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showPasswordStatus('✅ パスワードが正しいです！', 'success');
+                } else if (result.error && result.error.includes('パスワード')) {
+                    showPasswordStatus('❌ パスワードが間違っています', 'error');
+                } else {
+                    showPasswordStatus('❌ ' + result.error, 'error');
+                }
+            } catch (error) {
+                showPasswordStatus('❌ 接続エラー: ' + error.message, 'error');
+            } finally {
+                verifyPasswordBtn.disabled = false;
+                verifyPasswordBtn.textContent = 'パスワード確認';
+            }
+        }
+
+        function showPasswordStatus(message, type) {
+            passwordStatus.textContent = message;
+            passwordStatus.style.display = 'block';
+
+            if (type === 'success') {
+                passwordStatus.style.backgroundColor = '#d4edda';
+                passwordStatus.style.color = '#155724';
+                passwordStatus.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                passwordStatus.style.backgroundColor = '#f8d7da';
+                passwordStatus.style.color = '#721c24';
+                passwordStatus.style.border = '1px solid #f5c6cb';
+            }
+        }
 
         function handleFolderDragOver(e) {
             e.preventDefault();
