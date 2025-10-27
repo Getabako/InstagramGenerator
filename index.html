@@ -467,6 +467,7 @@
 
         <div class="tabs">
             <button class="tab-button active" data-tab="image-generator">画像生成</button>
+            <button class="tab-button" data-tab="file-uploader">ファイルアップロード</button>
             <button class="tab-button" data-tab="csv-generator">CSV作成</button>
         </div>
 
@@ -735,6 +736,65 @@
             <h2>🖼️ プレビュー（4:5）</h2>
             <div class="preview-grid" id="previewGrid"></div>
         </div>
+        </div>
+
+        <div class="tab-content" id="file-uploader">
+            <div class="controls" style="margin-bottom: 20px;">
+                <h2>🔐 アクセス設定</h2>
+                <div class="control-section">
+                    <div class="control-group" style="max-width: 400px;">
+                        <label>アップロード用パスワード</label>
+                        <input type="password" id="uploadPassword" placeholder="パスワードを入力" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em;">
+                        <div class="help-text" style="margin-top: 10px;">
+                            セキュリティのため、アップロード時にパスワード認証が必要です
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container" style="margin-bottom: 20px;">
+                <h2>📁 フォルダアップロード</h2>
+                <div class="file-upload-area" id="folderUploadArea" style="min-height: 300px;">
+                    <p style="font-size: 1.5em; margin-bottom: 20px;">📂 ここにフォルダをドラッグ&ドロップ</p>
+                    <p style="margin-bottom: 10px;">または</p>
+                    <button class="btn btn-primary" id="selectFolderBtn">フォルダを選択</button>
+                    <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
+                </div>
+                <div class="help-text" style="margin-top: 15px;">
+                    • フォルダをドラッグ&ドロップまたは選択してください<br>
+                    • フォルダ構造がそのまま保持されます<br>
+                    • 例: aaa/001.png → https://images.if-juku.net/aaa/001.png<br>
+                    • 対応ファイル形式: 画像ファイル（png, jpg, jpeg, gif, webp, svg）
+                </div>
+            </div>
+
+            <div id="uploadFileList" style="display: none; margin-bottom: 20px;">
+                <div class="controls">
+                    <h2>📋 アップロード予定ファイル</h2>
+                    <div style="background: white; padding: 20px; border-radius: 10px; max-height: 400px; overflow-y: auto;">
+                        <div id="uploadFileListContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="clearUploadBtn" style="display: none;">クリア</button>
+                <button class="btn btn-success" id="startUploadBtn" style="display: none;">アップロード開始</button>
+            </div>
+
+            <div class="progress-bar" id="uploadProgressBar" style="display: none;">
+                <div class="progress-fill" id="uploadProgressFill"></div>
+            </div>
+            <div class="status-text" id="uploadStatusText" style="display: none;"></div>
+
+            <div id="uploadResultSection" style="display: none; margin-top: 20px;">
+                <div class="controls">
+                    <h2>✅ アップロード完了</h2>
+                    <div style="background: white; padding: 20px; border-radius: 10px;">
+                        <div id="uploadResultContent"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="tab-content" id="csv-generator">
@@ -1535,6 +1595,287 @@ AI技術を子どもにも分かりやすく解説 写真を撮る AIが認識�
             link.click();
 
             URL.revokeObjectURL(link.href);
+        }
+
+        // ファイルアップロード機能
+        let uploadFiles = [];
+        const UPLOAD_API_URL = 'https://images.if-juku.net/upload.php'; // アップロード先のPHPファイルURL
+
+        const uploadPassword = document.getElementById('uploadPassword');
+        const folderUploadArea = document.getElementById('folderUploadArea');
+        const selectFolderBtn = document.getElementById('selectFolderBtn');
+        const folderInput = document.getElementById('folderInput');
+        const uploadFileList = document.getElementById('uploadFileList');
+        const uploadFileListContent = document.getElementById('uploadFileListContent');
+        const clearUploadBtn = document.getElementById('clearUploadBtn');
+        const startUploadBtn = document.getElementById('startUploadBtn');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
+        const uploadProgressFill = document.getElementById('uploadProgressFill');
+        const uploadStatusText = document.getElementById('uploadStatusText');
+        const uploadResultSection = document.getElementById('uploadResultSection');
+        const uploadResultContent = document.getElementById('uploadResultContent');
+
+        // イベントリスナー
+        selectFolderBtn.addEventListener('click', () => folderInput.click());
+        folderInput.addEventListener('change', handleFolderSelect);
+        folderUploadArea.addEventListener('dragover', handleFolderDragOver);
+        folderUploadArea.addEventListener('dragleave', handleFolderDragLeave);
+        folderUploadArea.addEventListener('drop', handleFolderDrop);
+        clearUploadBtn.addEventListener('click', clearUploadFiles);
+        startUploadBtn.addEventListener('click', startUpload);
+
+        function handleFolderDragOver(e) {
+            e.preventDefault();
+            folderUploadArea.classList.add('dragover');
+        }
+
+        function handleFolderDragLeave(e) {
+            e.preventDefault();
+            folderUploadArea.classList.remove('dragover');
+        }
+
+        function handleFolderDrop(e) {
+            e.preventDefault();
+            folderUploadArea.classList.remove('dragover');
+
+            const items = e.dataTransfer.items;
+            const files = [];
+
+            // DataTransferItemListからファイルを取得
+            const promises = [];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.kind === 'file') {
+                    const entry = item.webkitGetAsEntry();
+                    if (entry) {
+                        promises.push(traverseFileTree(entry, ''));
+                    }
+                }
+            }
+
+            Promise.all(promises).then(results => {
+                results.forEach(result => {
+                    files.push(...result);
+                });
+                addUploadFiles(files);
+            });
+        }
+
+        // ディレクトリを再帰的に走査
+        function traverseFileTree(item, path) {
+            return new Promise((resolve) => {
+                if (item.isFile) {
+                    item.file(file => {
+                        // 画像ファイルのみ許可
+                        const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+                        const ext = file.name.split('.').pop().toLowerCase();
+                        if (allowedExtensions.includes(ext)) {
+                            const relativePath = path + file.name;
+                            file.relativePath = relativePath;
+                            resolve([file]);
+                        } else {
+                            resolve([]);
+                        }
+                    });
+                } else if (item.isDirectory) {
+                    const dirReader = item.createReader();
+                    const files = [];
+
+                    const readEntries = () => {
+                        dirReader.readEntries(entries => {
+                            if (entries.length === 0) {
+                                resolve(files);
+                            } else {
+                                const promises = [];
+                                for (let i = 0; i < entries.length; i++) {
+                                    promises.push(traverseFileTree(entries[i], path + item.name + '/'));
+                                }
+                                Promise.all(promises).then(results => {
+                                    results.forEach(result => {
+                                        files.push(...result);
+                                    });
+                                    readEntries(); // 続きを読む
+                                });
+                            }
+                        });
+                    };
+                    readEntries();
+                } else {
+                    resolve([]);
+                }
+            });
+        }
+
+        function handleFolderSelect(e) {
+            const files = Array.from(e.target.files);
+
+            // webkitRelativePathからrelativePathを設定
+            files.forEach(file => {
+                if (file.webkitRelativePath) {
+                    file.relativePath = file.webkitRelativePath;
+                }
+            });
+
+            // 画像ファイルのみフィルタリング
+            const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+            const imageFiles = files.filter(file => {
+                const ext = file.name.split('.').pop().toLowerCase();
+                return allowedExtensions.includes(ext);
+            });
+
+            addUploadFiles(imageFiles);
+        }
+
+        function addUploadFiles(files) {
+            uploadFiles = files;
+            updateUploadFileList();
+        }
+
+        function updateUploadFileList() {
+            if (uploadFiles.length === 0) {
+                uploadFileList.style.display = 'none';
+                clearUploadBtn.style.display = 'none';
+                startUploadBtn.style.display = 'none';
+                return;
+            }
+
+            // フォルダごとにグループ化
+            const folderGroups = {};
+            uploadFiles.forEach(file => {
+                const pathParts = file.relativePath.split('/');
+                const folderName = pathParts.length > 1 ? pathParts[0] : 'ルート';
+
+                if (!folderGroups[folderName]) {
+                    folderGroups[folderName] = [];
+                }
+                folderGroups[folderName].push(file);
+            });
+
+            let html = '';
+            for (const [folderName, files] of Object.entries(folderGroups)) {
+                html += `<div style="margin-bottom: 20px;">
+                    <h3 style="color: #e6683c; margin-bottom: 10px;">📁 ${folderName} (${files.length}ファイル)</h3>
+                    <ul style="list-style: none; padding-left: 20px;">`;
+
+                files.forEach(file => {
+                    const sizeKB = (file.size / 1024).toFixed(2);
+                    html += `<li style="padding: 5px 0; color: #666;">
+                        📄 ${file.relativePath} (${sizeKB} KB)
+                    </li>`;
+                });
+
+                html += `</ul></div>`;
+            }
+
+            uploadFileListContent.innerHTML = html;
+            uploadFileList.style.display = 'block';
+            clearUploadBtn.style.display = 'inline-block';
+            startUploadBtn.style.display = 'inline-block';
+        }
+
+        function clearUploadFiles() {
+            uploadFiles = [];
+            folderInput.value = '';
+            updateUploadFileList();
+            uploadResultSection.style.display = 'none';
+        }
+
+        async function startUpload() {
+            if (uploadFiles.length === 0) {
+                alert('アップロードするファイルを選択してください。');
+                return;
+            }
+
+            const password = uploadPassword.value.trim();
+            if (!password) {
+                alert('パスワードを入力してください。');
+                return;
+            }
+
+            uploadProgressBar.style.display = 'block';
+            uploadStatusText.style.display = 'block';
+            uploadResultSection.style.display = 'none';
+            startUploadBtn.disabled = true;
+
+            const results = [];
+            const errors = [];
+
+            for (let i = 0; i < uploadFiles.length; i++) {
+                const file = uploadFiles[i];
+                const progress = ((i + 1) / uploadFiles.length) * 100;
+                uploadProgressFill.style.width = progress + '%';
+                uploadStatusText.textContent = `アップロード中... (${i + 1}/${uploadFiles.length})`;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('path', file.relativePath);
+                    formData.append('password', password);
+
+                    const response = await fetch(UPLOAD_API_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        results.push({
+                            file: file.relativePath,
+                            url: result.url
+                        });
+                    } else {
+                        errors.push({
+                            file: file.relativePath,
+                            error: result.error
+                        });
+                    }
+                } catch (error) {
+                    errors.push({
+                        file: file.relativePath,
+                        error: error.message
+                    });
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            uploadStatusText.textContent = `アップロード完了！ (成功: ${results.length}件, 失敗: ${errors.length}件)`;
+            startUploadBtn.disabled = false;
+
+            // 結果表示
+            let resultHtml = '';
+
+            if (results.length > 0) {
+                resultHtml += '<h3 style="color: #28a745; margin-bottom: 10px;">✅ 成功 (' + results.length + '件)</h3>';
+                resultHtml += '<ul style="list-style: none; padding: 0; margin-bottom: 20px;">';
+                results.forEach(item => {
+                    resultHtml += `<li style="padding: 5px 0; color: #666;">
+                        📄 ${item.file}<br>
+                        <a href="${item.url}" target="_blank" style="color: #007bff; font-size: 0.9em;">${item.url}</a>
+                    </li>`;
+                });
+                resultHtml += '</ul>';
+            }
+
+            if (errors.length > 0) {
+                resultHtml += '<h3 style="color: #dc3545; margin-bottom: 10px;">❌ 失敗 (' + errors.length + '件)</h3>';
+                resultHtml += '<ul style="list-style: none; padding: 0;">';
+                errors.forEach(item => {
+                    resultHtml += `<li style="padding: 5px 0; color: #dc3545;">
+                        📄 ${item.file}<br>
+                        <span style="font-size: 0.9em;">エラー: ${item.error}</span>
+                    </li>`;
+                });
+                resultHtml += '</ul>';
+            }
+
+            uploadResultContent.innerHTML = resultHtml;
+            uploadResultSection.style.display = 'block';
+
+            setTimeout(() => {
+                uploadProgressBar.style.display = 'none';
+            }, 2000);
         }
     </script>
 </body>
