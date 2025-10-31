@@ -1,0 +1,57 @@
+# ファイルアップロード用セキュリティ設定
+# このファイルを images.if-juku.net のルートディレクトリに .htaccess として配置してください
+
+# PHPの設定
+php_value upload_max_filesize 10M
+php_value post_max_size 20M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+# ディレクトリリスティングを無効化
+Options -Indexes
+
+# .htaccessと.htpasswdへのアクセスを禁止
+<Files ~ "^\.ht">
+    Require all denied
+</Files>
+
+# upload.phpへのアクセス制御（POSTリクエストのみ許可）
+<Files "upload.php">
+    <LimitExcept POST OPTIONS>
+        Require all denied
+    </LimitExcept>
+</Files>
+
+# エラーページの設定（オプション）
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+
+# セキュリティヘッダー
+<IfModule mod_headers.c>
+    # XSS攻撃対策
+    Header set X-XSS-Protection "1; mode=block"
+
+    # クリックジャッキング対策
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # MIMEタイプスニッフィング対策
+    Header set X-Content-Type-Options "nosniff"
+
+    # Referrer-Policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 画像ファイルのキャッシュ設定
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
+
+# Gzip圧縮
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
